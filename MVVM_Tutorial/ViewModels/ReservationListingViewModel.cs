@@ -8,6 +8,7 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -19,9 +20,9 @@
         private readonly HotelStore hotelStore;
 
         public IEnumerable<ReservationViewModel> Reservations => reservations;
+        public bool HasReservations => Reservations.Any();
 
         private string? errorMessage;
-
         public string? ErrorMessage
         {
             get => errorMessage;
@@ -36,7 +37,6 @@
         public bool HasErrorMessage => !string.IsNullOrWhiteSpace(ErrorMessage);
 
         private bool isLoading;
-
         public bool IsLoading
         {
             get => isLoading;
@@ -60,12 +60,18 @@
             LoadReservationCommand = new LoadReservationCommand(hotelStore, this);
 
             hotelStore.ReservationMade += OnReservationMade;
+            reservations.CollectionChanged += OnReservationsChanged;
         }
 
         public override void Dispose()
         {
             hotelStore.ReservationMade -= OnReservationMade;
             base.Dispose();
+        }
+
+        private void OnReservationsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(HasReservations));
         }
 
         private void OnReservationMade(Reservation reservation)
