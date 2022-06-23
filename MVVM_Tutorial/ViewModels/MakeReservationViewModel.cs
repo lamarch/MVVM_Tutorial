@@ -17,21 +17,60 @@
         public string Username
         {
             get { return username; }
-            set { username = value; OnPropertyChanged(nameof(Username)); }
+            set
+            {
+                username = value;
+                OnPropertyChanged(nameof(Username));
+
+                ClearErrors(nameof(Username));
+
+                if (string.IsNullOrWhiteSpace(Username))
+                {
+                    AddError("The username cannot be empty.", nameof(Username));
+                }
+
+                OnPropertyChanged(nameof(CanMakeReservation));
+            }
         }
 
         int roomNumber;
         public int RoomNumber
         {
             get { return roomNumber; }
-            set { roomNumber = value; OnPropertyChanged(nameof(RoomNumber)); }
+            set
+            {
+                roomNumber = value;
+                OnPropertyChanged(nameof(RoomNumber));
+
+                ClearErrors(nameof(RoomNumber));
+
+                if (FloorNumber <= 0)
+                {
+                    AddError("The room number must be greater than 0.", nameof(RoomNumber));
+                }
+
+                OnPropertyChanged(nameof(CanMakeReservation));
+            }
         }
 
         int floorNumber;
         public int FloorNumber
         {
             get { return floorNumber; }
-            set { floorNumber = value; OnPropertyChanged(nameof(FloorNumber)); }
+            set
+            {
+                floorNumber = value;
+                OnPropertyChanged(nameof(FloorNumber));
+
+                ClearErrors(nameof(FloorNumber));
+
+                if (FloorNumber <= 0)
+                {
+                    AddError("The floor number must be greater than 0.", nameof(FloorNumber));
+                }
+
+                OnPropertyChanged(nameof(CanMakeReservation));
+            }
         }
 
         DateTime startTime = new DateTime(2022, 1, 1);
@@ -50,12 +89,12 @@
                 {
                     AddError("The start time cannot be after the end time.", nameof(StartTime));
                 }
+
+                OnPropertyChanged(nameof(CanMakeReservation));
             }
         }
 
         DateTime endTime = new DateTime(2022, 1, 2);
-
-
         public DateTime EndTime
         {
             get { return endTime; }
@@ -71,9 +110,16 @@
                 {
                     AddError("The end time cannot be before the start time.", nameof(EndTime));
                 }
+
+                OnPropertyChanged(nameof(CanMakeReservation));
             }
         }
 
+        public bool CanMakeReservation =>
+            !string.IsNullOrWhiteSpace(Username) &&
+            FloorNumber > 0 &&
+            RoomNumber > 0 &&
+            StartTime < EndTime;
 
         public ICommand SubmitCommand { get; }
 
@@ -93,6 +139,7 @@
         private readonly Dictionary<string, List<string>> propertyNameToErrorsDictionnary;
 
         public bool HasErrors => propertyNameToErrorsDictionnary.Any();
+
 
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 

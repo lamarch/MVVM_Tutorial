@@ -32,10 +32,7 @@
 
         public override bool CanExecute(object? parameter)
         {
-            return base.CanExecute(parameter)
-                   && !string.IsNullOrWhiteSpace(makeReservationViewModel.Username)
-                   && makeReservationViewModel.FloorNumber > 0
-                   && makeReservationViewModel.RoomNumber > 0;
+            return base.CanExecute(parameter) && makeReservationViewModel.CanMakeReservation;
         }
 
         public override async Task ExecuteAsync(object? parameter)
@@ -65,9 +62,7 @@
 
         private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(MakeReservationViewModel.Username)
-                || e.PropertyName == nameof(MakeReservationViewModel.FloorNumber)
-                || e.PropertyName == nameof(MakeReservationViewModel.RoomNumber))
+            if (e.PropertyName == nameof(MakeReservationViewModel.CanMakeReservation))
                 base.OnCanExecuteChanged();
         }
     }
