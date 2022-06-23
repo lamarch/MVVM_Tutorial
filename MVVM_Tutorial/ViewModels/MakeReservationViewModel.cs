@@ -130,45 +130,7 @@
         {
             SubmitCommand = new MakeReservationCommand(this, hotelStore, reservationListingViewNavigationService);
             CancelCommand = new NavigateCommand<ReservationListingViewModel>(reservationListingViewNavigationService);
-
-            propertyNameToErrorsDictionnary = new();
         }
 
-        // Error handling region
-
-        private readonly Dictionary<string, List<string>> propertyNameToErrorsDictionnary;
-
-        public bool HasErrors => propertyNameToErrorsDictionnary.Any();
-
-
-        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
-
-        private void OnErrorsChanged(DataErrorsChangedEventArgs e)
-        {
-            ErrorsChanged?.Invoke(this, e);
-        }
-
-        public IEnumerable GetErrors(string? propertyName)
-        {
-            return propertyNameToErrorsDictionnary.GetValueOrDefault(propertyName, new List<string>());
-        }
-
-        private void AddError(string errorMessage, string propertyName)
-        {
-            if (!propertyNameToErrorsDictionnary.ContainsKey(propertyName))
-            {
-                propertyNameToErrorsDictionnary[propertyName] = new List<string>();
-            }
-            propertyNameToErrorsDictionnary[propertyName].Add(errorMessage);
-
-            OnErrorsChanged(new(propertyName));
-        }
-
-        private void ClearErrors(string propertyName)
-        {
-            propertyNameToErrorsDictionnary.Remove(propertyName);
-
-            OnErrorsChanged(new(propertyName));
-        }
     }
 }
