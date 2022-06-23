@@ -1,42 +1,36 @@
-﻿namespace MVVM_Tutorial.Commands
+﻿namespace MVVM_Tutorial.Commands;
+
+using MVVM_Tutorial.Stores;
+using MVVM_Tutorial.ViewModels;
+
+using System;
+using System.Threading.Tasks;
+
+internal class LoadReservationCommand : AsyncCommandBase
 {
-    using MVVM_Tutorial.Models;
-    using MVVM_Tutorial.Stores;
-    using MVVM_Tutorial.ViewModels;
+    private readonly HotelStore hotelStore;
+    private readonly ReservationListingViewModel viewModel;
 
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using System.Windows;
-
-    internal class LoadReservationCommand : AsyncCommandBase
+    public LoadReservationCommand(HotelStore hotelStore, ReservationListingViewModel viewModel)
     {
-        private readonly HotelStore hotelStore;
-        private readonly ReservationListingViewModel viewModel;
+        this.hotelStore = hotelStore;
+        this.viewModel = viewModel;
+    }
 
-        public LoadReservationCommand(HotelStore hotelStore, ReservationListingViewModel viewModel)
+    public override async Task ExecuteAsync(object? parameter)
+    {
+        viewModel.ErrorMessage = null;
+        viewModel.IsLoading = true;
+        try
         {
-            this.hotelStore = hotelStore;
-            this.viewModel = viewModel;
-        } 
+            await hotelStore.Load();
 
-        public override async Task ExecuteAsync(object? parameter)
-        {
-            viewModel.ErrorMessage = null;
-            viewModel.IsLoading = true;
-            try
-            {
-                await hotelStore.Load();
-
-                viewModel.UpdateReservations(hotelStore.Reservations);
-            }
-            catch (Exception)
-            {
-                viewModel.ErrorMessage = "Failed to load reservations.";
-            }
-            viewModel.IsLoading = false;
+            viewModel.UpdateReservations(hotelStore.Reservations);
         }
+        catch (Exception)
+        {
+            viewModel.ErrorMessage = "Failed to load reservations.";
+        }
+        viewModel.IsLoading = false;
     }
 }

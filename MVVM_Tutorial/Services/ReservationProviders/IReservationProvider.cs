@@ -1,15 +1,11 @@
-﻿namespace MVVM_Tutorial.Services.ReservationProviders
+﻿namespace MVVM_Tutorial.Services.ReservationProviders;
+
+using MVVM_Tutorial.Models;
+
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+internal interface IReservationProvider
 {
-    using MVVM_Tutorial.Models;
-
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-
-    internal interface IReservationProvider
-    {
-        Task<IEnumerable<Reservation>> GetAllReservations();
-    }
+    Task<IEnumerable<Reservation>> GetAllReservations();
 }

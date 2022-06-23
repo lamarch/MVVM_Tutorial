@@ -1,26 +1,21 @@
-﻿namespace MVVM_Tutorial.Commands
+﻿namespace MVVM_Tutorial.Commands;
+
+using System;
+using System.Windows.Input;
+
+internal abstract class CommandBase : ICommand
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using System.Windows.Input;
+    public event EventHandler? CanExecuteChanged;
 
-    internal abstract class CommandBase : ICommand
+    public virtual bool CanExecute(object? parameter)
     {
-        public event EventHandler? CanExecuteChanged;
+        return true;
+    }
 
-        public virtual bool CanExecute(object? parameter)
-        {
-            return true;
-        }
+    public abstract void Execute(object? parameter);
 
-        public abstract void Execute(object? parameter);
-
-        protected void OnCanExecuteChanged()
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        }
+    protected void OnCanExecuteChanged()
+    {
+        CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
 }

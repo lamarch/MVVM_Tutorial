@@ -1,26 +1,22 @@
-﻿namespace MVVM_Tutorial.Models
+﻿namespace MVVM_Tutorial.Models;
+
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+internal class Hotel
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
+    private readonly ReservationBook reservationBook;
+    public string Name { get; }
 
-    internal class Hotel
+    public Hotel(string name, ReservationBook reservationBook)
     {
-        private readonly ReservationBook reservationBook;
-        public string Name { get; }
+        Name = name;
 
-        public Hotel(string name, ReservationBook reservationBook)
-        {
-            Name = name;
-
-            this.reservationBook = reservationBook;
-        }
-
-        public async Task<IEnumerable<Reservation>> GetAllReservations() => await reservationBook.GetAllReservations();
-
-        public async Task MakeReservation(Reservation reservation) => await reservationBook.AddReservation(reservation);
-
+        this.reservationBook = reservationBook;
     }
+
+    public async Task<IEnumerable<Reservation>> GetAllReservations() => await reservationBook.GetAllReservations();
+
+    public async Task MakeReservation(Reservation reservation) => await reservationBook.AddReservation(reservation);
+
 }

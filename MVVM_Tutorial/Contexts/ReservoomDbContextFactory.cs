@@ -1,28 +1,20 @@
-﻿namespace MVVM_Tutorial.Contexts
+﻿namespace MVVM_Tutorial.Contexts;
+
+using Microsoft.EntityFrameworkCore;
+
+internal class ReservoomDbContextFactory
 {
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore.Design;
+    private readonly string connectionString;
 
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-
-    internal class ReservoomDbContextFactory
+    public ReservoomDbContextFactory(string connectionString)
     {
-        private readonly string connectionString;
+        this.connectionString = connectionString;
+    }
 
-        public ReservoomDbContextFactory(string connectionString)
-        {
-            this.connectionString = connectionString;
-        }
+    public ReservoomDbContext CreateDbContext()
+    {
+        DbContextOptions options = new DbContextOptionsBuilder().UseSqlite(connectionString).Options;
 
-        public ReservoomDbContext CreateDbContext()
-        {
-            DbContextOptions options = new DbContextOptionsBuilder().UseSqlite(connectionString).Options;
-
-            return new ReservoomDbContext(options);
-        }
+        return new ReservoomDbContext(options);
     }
 }

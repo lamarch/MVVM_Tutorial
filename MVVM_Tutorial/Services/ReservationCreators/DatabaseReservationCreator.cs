@@ -1,46 +1,39 @@
-﻿namespace MVVM_Tutorial.Services.ReservationCreators
+﻿namespace MVVM_Tutorial.Services.ReservationCreators;
+
+using MVVM_Tutorial.Contexts;
+using MVVM_Tutorial.DTOs;
+using MVVM_Tutorial.Models;
+
+using System.Threading.Tasks;
+
+internal class DatabaseReservationCreator : IReservationCreator
 {
-    using MVVM_Tutorial.Contexts;
-    using MVVM_Tutorial.DTOs;
-    using MVVM_Tutorial.Models;
+    private readonly ReservoomDbContextFactory dbContextFactory;
 
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-
-    internal class DatabaseReservationCreator : IReservationCreator
+    public DatabaseReservationCreator(ReservoomDbContextFactory dbContextFactory)
     {
-        private readonly ReservoomDbContextFactory dbContextFactory;
+        this.dbContextFactory = dbContextFactory;
+    }
 
-        public DatabaseReservationCreator(ReservoomDbContextFactory dbContextFactory)
+    public async Task CreateReservation(Reservation reservation)
+    {
+        using ReservoomDbContext context = dbContextFactory.CreateDbContext();
+        ReservationDTO reservationDTO = ToReservationDTO(reservation);
+
+        context.Reservations.Add(reservationDTO);
+
+        await context.SaveChangesAsync();
+    }
+
+    private ReservationDTO ToReservationDTO(Reservation reservation)
+    {
+        return new ReservationDTO()
         {
-            this.dbContextFactory = dbContextFactory;
-        }
-
-        public async Task CreateReservation(Reservation reservation)
-        {
-            using(ReservoomDbContext context = dbContextFactory.CreateDbContext())
-            {
-                ReservationDTO reservationDTO = ToReservationDTO(reservation);
-
-                context.Reservations.Add(reservationDTO);
-
-                await context.SaveChangesAsync();
-            }
-        }
-
-        private ReservationDTO ToReservationDTO(Reservation reservation)
-        {
-            return new ReservationDTO()
-            {
-                FloorNumber = reservation.RoomID.FloorNumber,
-                RoomNumber = reservation.RoomID.RoomNumber,
-                StartTime = reservation.StartTime,
-                EndTime = reservation.EndTime,
-                Username = reservation.Username,
-            };
-        }
+            FloorNumber = reservation.RoomID.FloorNumber,
+            RoomNumber = reservation.RoomID.RoomNumber,
+            StartTime = reservation.StartTime,
+            EndTime = reservation.EndTime,
+            Username = reservation.Username,
+        };
     }
 }

@@ -1,69 +1,65 @@
-﻿namespace MVVM_Tutorial.Commands
+﻿namespace MVVM_Tutorial.Commands;
+
+using MVVM_Tutorial.Exceptions;
+using MVVM_Tutorial.Models;
+using MVVM_Tutorial.Services;
+using MVVM_Tutorial.Stores;
+using MVVM_Tutorial.ViewModels;
+
+using System;
+using System.ComponentModel;
+using System.Threading.Tasks;
+using System.Windows;
+
+internal class MakeReservationCommand : AsyncCommandBase
 {
-    using MVVM_Tutorial.Exceptions;
-    using MVVM_Tutorial.Models;
-    using MVVM_Tutorial.Services;
-    using MVVM_Tutorial.Stores;
-    using MVVM_Tutorial.ViewModels;
+    private readonly MakeReservationViewModel makeReservationViewModel;
+    private readonly HotelStore hotelStore;
+    private readonly NavigationService<ReservationListingViewModel> reservationViewNavigationService;
 
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using System.Windows;
-
-    internal class MakeReservationCommand : AsyncCommandBase
+    public MakeReservationCommand(MakeReservationViewModel makeReservationViewModel,
+                                  HotelStore hotelStore,
+                                  NavigationService<ReservationListingViewModel> reservationListingViewNavigationService)
     {
-        private readonly MakeReservationViewModel makeReservationViewModel;
-        private readonly HotelStore hotelStore;
-        private readonly NavigationService<ReservationListingViewModel> reservationViewNavigationService;
+        this.makeReservationViewModel = makeReservationViewModel;
+        this.hotelStore = hotelStore;
+        this.reservationViewNavigationService = reservationListingViewNavigationService;
+        makeReservationViewModel.PropertyChanged += OnPropertyChanged;
+    }
 
-        public MakeReservationCommand(MakeReservationViewModel makeReservationViewModel,
-                                      HotelStore hotelStore,
-                                      NavigationService<ReservationListingViewModel> reservationListingViewNavigationService)
+    public override bool CanExecute(object? parameter)
+    {
+        return base.CanExecute(parameter) && makeReservationViewModel.CanMakeReservation;
+    }
+
+    public override async Task ExecuteAsync(object? parameter)
+    {
+        var reservation = new Reservation(
+            new RoomID(makeReservationViewModel.FloorNumber, makeReservationViewModel.RoomNumber),
+            makeReservationViewModel.StartTime,
+            makeReservationViewModel.EndTime,
+            makeReservationViewModel.Username);
+        try
         {
-            this.makeReservationViewModel = makeReservationViewModel;
-            this.hotelStore = hotelStore;
-            this.reservationViewNavigationService = reservationListingViewNavigationService;
-            makeReservationViewModel.PropertyChanged += OnPropertyChanged;
-        }
+            await hotelStore.MakeReservation(reservation);
 
-        public override bool CanExecute(object? parameter)
+            MessageBox.Show("Successfully reserved room.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            reservationViewNavigationService.Navigate();
+        }
+        catch (ReservationConflictException)
         {
-            return base.CanExecute(parameter) && makeReservationViewModel.CanMakeReservation;
+            MessageBox.Show("This room is already taken at this time.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
-
-        public override async Task ExecuteAsync(object? parameter)
+        catch (Exception)
         {
-            var reservation = new Reservation(
-                new RoomID(makeReservationViewModel.FloorNumber, makeReservationViewModel.RoomNumber),
-                makeReservationViewModel.StartTime, 
-                makeReservationViewModel.EndTime, 
-                makeReservationViewModel.Username);
-            try
-            {
-                await hotelStore.MakeReservation(reservation);
-
-                MessageBox.Show("Successfully reserved room.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                reservationViewNavigationService.Navigate();
-            }
-            catch (ReservationConflictException)
-            {
-                MessageBox.Show("This room is already taken at this time.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Failed to make reservation.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            MessageBox.Show("Failed to make reservation.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
+    }
 
-        private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(MakeReservationViewModel.CanMakeReservation))
-                base.OnCanExecuteChanged();
-        }
+    private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MakeReservationViewModel.CanMakeReservation))
+            base.OnCanExecuteChanged();
     }
 }

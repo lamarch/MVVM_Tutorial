@@ -1,26 +1,18 @@
-﻿namespace MVVM_Tutorial.ViewModels
+﻿namespace MVVM_Tutorial.ViewModels;
+
+using MVVM_Tutorial.Models;
+
+internal class ReservationViewModel : ViewModelBase
 {
-    using MVVM_Tutorial.Models;
+    private readonly Reservation reservation;
 
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-
-    internal class ReservationViewModel : ViewModelBase
+    public ReservationViewModel(Reservation reservation)
     {
-        private readonly Reservation reservation;
-
-        public ReservationViewModel(Reservation reservation)
-        {
-            this.reservation = reservation;
-        }
-
-        public string RoomID => reservation.RoomID.ToString();
-        public string Username => reservation.Username;
-        public string StartTime => reservation.StartTime.ToString("d");
-        public string EndTime => reservation.EndTime.ToString("d");
+        this.reservation = reservation;
     }
+
+    public string RoomID => reservation.RoomID.ToString();
+    public string Username => reservation.Username;
+    public string StartTime => reservation.StartTime.ToString("d");
+    public string EndTime => reservation.EndTime.ToString("d");
 }
