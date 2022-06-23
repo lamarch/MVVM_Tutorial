@@ -3,7 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using MVVM_Tutorial.Contexts;
-using MVVM_Tutorial.DTOs;
+using MVVM_Tutorial.Converters;
 using MVVM_Tutorial.Models;
 
 using System.Linq;
@@ -28,11 +28,6 @@ internal class DatabaseReservationConflictValidator : IReservationConflictValida
             .Where(r => r.EndTime > reservation.StartTime)
             .FirstOrDefaultAsync();
 
-        return dto is null ? null : ToReservation(dto);
-    }
-
-    private Reservation ToReservation(ReservationDTO dto)
-    {
-        return new Reservation(new RoomID(dto.FloorNumber, dto.RoomNumber), dto.StartTime, dto.EndTime, dto.Username ?? "");
+        return dto is null ? null : dto.ToReservationModel();
     }
 }

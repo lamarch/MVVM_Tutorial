@@ -3,7 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using MVVM_Tutorial.Contexts;
-using MVVM_Tutorial.DTOs;
+using MVVM_Tutorial.Converters;
 using MVVM_Tutorial.Models;
 
 using System.Collections.Generic;
@@ -26,11 +26,6 @@ internal class DatabaseReservationProvider : IReservationProvider
 
         await Task.Delay(1000);
 
-        return reservationDTOs.Select(dto => ToReservation(dto));
-    }
-
-    private Reservation ToReservation(ReservationDTO dto)
-    {
-        return new Reservation(new RoomID(dto.FloorNumber, dto.RoomNumber), dto.StartTime, dto.EndTime, dto.Username ?? "");
+        return reservationDTOs.Select(dto => dto.ToReservationModel());
     }
 }
